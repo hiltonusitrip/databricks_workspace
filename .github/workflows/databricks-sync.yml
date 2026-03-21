@@ -55,10 +55,6 @@ jobs:
               # Create directory if needed
               databricks workspace mkdirs "$(dirname "$TARGET")"
             
-              databricks workspace import \
-  	        "$file" \
-  	        "$TARGET" \
-  	        --format SOURCE \
-  	        --overwrite
+              databricks workspace import "$file" "$TARGET" --format SOURCE --overwrite
             fi
           done < changes.txt
