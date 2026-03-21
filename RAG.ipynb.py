@@ -1,5 +1,4 @@
 # Databricks notebook source
-
 doc_articles = spark.read.text('/Volumes/hilton_hotmail/default/dataset/databricks_how_to_download/')
 doc_articles.write.mode('overwrite').saveAsTable('raw_documentation')
 
@@ -7,13 +6,14 @@ display(doc_articles)
 
 
 # COMMAND ----------
+
 # TEST10
-# MAGIC %pip install databricks-vectorsearch
-# MAGIC
-# MAGIC dbutils.library.restartPython()
-# MAGIC from transformers import AutoTokenizer, OpenAIGPTTokenizer
-# MAGIC from langchain.text_splitter import RecursiveCharacterTextSplitter, HTMLHeaderTextSplitter
-# MAGIC
+%pip install databricks-vectorsearch
+
+dbutils.library.restartPython()
+from transformers import AutoTokenizer, OpenAIGPTTokenizer
+from langchain.text_splitter import RecursiveCharacterTextSplitter, HTMLHeaderTextSplitter
+
 
 # COMMAND ----------
 
