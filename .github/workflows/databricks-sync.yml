@@ -1,0 +1,30 @@
+name: Deploy to Databricks
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Verify CLI
+        run: databricks version
+
+      - name: Sync files to Databricks
+        run: |
+          databricks sync \
+          ./ \
+          /Users/hma68@hotmail.com
