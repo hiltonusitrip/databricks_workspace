@@ -1,0 +1,12 @@
+.bundle/
+.git/
+.github/
+.gitattributes
+.gitignore
+
+Drafts/
+New Pipeline*/
+Untitled Notebook*
+
+*.ipynb
+*.dbc
