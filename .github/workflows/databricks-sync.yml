@@ -27,4 +27,4 @@ jobs:
         run: |
           databricks sync \
           ./ \
-          /Users/hma68@hotmail.com --full
+          /Users/hma68@hotmail.com
