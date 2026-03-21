@@ -1,4 +1,5 @@
 -- Databricks notebook source
+-- TEST
 -- MAGIC %python
 -- MAGIC class cube:
 -- MAGIC     def __init__(self, edge):
