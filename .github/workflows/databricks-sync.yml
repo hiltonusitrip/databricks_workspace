@@ -56,9 +56,9 @@ jobs:
               databricks workspace mkdirs "$(dirname "$TARGET")"
             
               databricks workspace import \
-  		"$file" \
-  		"$TARGET" \
-  		--format SOURCE \
-  		--overwrite
+  	        "$file" \
+  	        "$TARGET" \
+  	        --format SOURCE \
+  	        --overwrite
             fi
           done < changes.txt
