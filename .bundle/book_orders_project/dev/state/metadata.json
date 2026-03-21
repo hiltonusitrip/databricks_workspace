@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "config": {
+    "bundle": {
+      "git": {
+        "bundle_root_path": "."
+      }
+    },
+    "workspace": {
+      "file_path": "/Workspace/Users/hma68@hotmail.com/.bundle/book_orders_project/dev/files"
+    },
+    "resources": {
+      "jobs": {
+        "book_orders_job": {
+          "id": "915369795632739",
+          "relative_path": "resources/book_orders_job.job.yml"
+        }
+      },
+      "pipelines": {
+        "dlt_china": {
+          "id": "190a06ec-3905-4b71-beff-5c0903f18215",
+          "relative_path": "resources/book_orders_project_etl.pipeline.yml"
+        }
+      }
+    },
+    "presets": {
+      "source_linked_deployment": false
+    }
+  },
+  "extra": {}
+}

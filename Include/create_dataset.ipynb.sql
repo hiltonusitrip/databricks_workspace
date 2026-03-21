@@ -1,0 +1,26 @@
+-- Databricks notebook source
+-- MAGIC %python
+-- MAGIC import os, requests
+-- MAGIC
+-- MAGIC #spark.conf.set("fs.s3a.aws.credentials.provider",
+-- MAGIC #               "org.apache.hadoop.fs.s3a.AnonymousAWSCredentialsProvider")
+-- MAGIC # If you want to pin region endpoint (optional, can help)
+-- MAGIC #spark.conf.set("fs.s3a.endpoint", "s3.amazonaws.com")
+-- MAGIC
+-- MAGIC def copy_recursive(src: str, dst: str):
+-- MAGIC     dbutils.fs.mkdirs(dst)
+-- MAGIC     for f in dbutils.fs.ls(src):
+-- MAGIC         src_path = f.path
+-- MAGIC         dst_path = f"{dst}/{f.name}"
+-- MAGIC         if f.isDir():
+-- MAGIC             copy_recursive(src_path, dst_path)
+-- MAGIC         else:
+-- MAGIC             if not path_exists(dst_path):
+-- MAGIC                 print(f"Copying {src_path} -> {dst_path}")
+-- MAGIC                 dbutils.fs.cp(src_path, dst_path, True)
+-- MAGIC
+-- MAGIC data_source_uri = "s3a://dalhussein-courses/datasets/bookstore/v1"
+-- MAGIC dataset_bookstore = "/Volumes/hilton_catalog/bronze/dataset"
+-- MAGIC
+-- MAGIC copy_recursive(data_source_uri, dataset_bookstore)
+-- MAGIC

@@ -1,0 +1,123 @@
+name: Databricks Bundle CI/CD
+
+on:
+  push:
+    branches:
+      - dev
+      - test
+      - main
+
+concurrency:
+  group: databricks-bundle-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  discover-bundles:
+    runs-on: ubuntu-latest
+    outputs:
+      bundles: ${{ steps.find.outputs.bundles }}
+      target: ${{ steps.target.outputs.target }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set deployment target
+        id: target
+        run: |
+          if [ "${GITHUB_REF}" = "refs/heads/dev" ]; then
+            echo 'target=dev' >> "$GITHUB_OUTPUT"
+          elif [ "${GITHUB_REF}" = "refs/heads/test" ]; then
+            echo 'target=test' >> "$GITHUB_OUTPUT"
+          elif [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+            echo 'target=prod' >> "$GITHUB_OUTPUT"
+          else
+            echo 'target=' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Find changed bundle roots
+        id: find
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            CHANGED_FILES=$(git ls-files)
+          else
+            CHANGED_FILES=$(git diff --name-only "$BEFORE" "$AFTER")
+          fi
+
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          BUNDLE_DIRS=()
+
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            dir=$(dirname "$file")
+
+            while [ "$dir" != "." ] && [ "$dir" != "/" ]; do
+              if [ -f "$dir/databricks.yml" ]; then
+                BUNDLE_DIRS+=("$dir")
+                break
+              fi
+              dir=$(dirname "$dir")
+            done
+
+            if [ -f "databricks.yml" ]; then
+              BUNDLE_DIRS+=(".")
+            fi
+          done <<< "$CHANGED_FILES"
+
+          if [ ${#BUNDLE_DIRS[@]} -eq 0 ]; then
+            echo 'bundles=[]' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          UNIQUE_JSON=$(printf '%s\n' "${BUNDLE_DIRS[@]}" | sort -u | jq -R . | jq -s -c .)
+          echo "Detected bundles: $UNIQUE_JSON"
+          echo "bundles=$UNIQUE_JSON" >> "$GITHUB_OUTPUT"
+
+  deploy-bundles:
+    needs: discover-bundles
+    if: ${{ needs.discover-bundles.outputs.bundles != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        bundle_dir: ${{ fromJson(needs.discover-bundles.outputs.bundles) }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Validate bundle
+        working-directory: ${{ matrix.bundle_dir }}
+        run: databricks bundle validate -t ${{ needs.discover-bundles.outputs.target }}
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+      - name: Deploy bundle
+        working-directory: ${{ matrix.bundle_dir }}
+        run: databricks bundle deploy -t ${{ needs.discover-bundles.outputs.target }}
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+      - name: Run bundle job
+        working-directory: ${{ matrix.bundle_dir }}
+        run: |
+          JOB_KEY=$(yq '.resources.jobs | keys | .[0]' resources/jobs.yml)
+          databricks bundle run -t ${{ needs.discover-bundles.outputs.target }} "$JOB_KEY"
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}

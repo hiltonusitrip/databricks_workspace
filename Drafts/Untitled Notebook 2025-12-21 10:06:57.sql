@@ -1,0 +1,8 @@
+-- Databricks notebook source
+-- MAGIC %python
+-- MAGIC from pyspark.sql.functions import *
+-- MAGIC df = (spark.range(1, 10)
+-- MAGIC         .select(hash('id').alias('id'), rand().alias('value')
+-- MAGIC          )
+-- MAGIC      )
+-- MAGIC df.display()

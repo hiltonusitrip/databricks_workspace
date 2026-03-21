@@ -1,0 +1,24 @@
+# Model training job - trains and registers model to Unity Catalog
+# Model is registered as: ${var.catalog}.${var.schema}.${var.model_name}
+# Uses serverless compute (no cluster definition) for serverless-only workspaces.
+
+resources:
+  jobs:
+    model_training_job:
+      name: "[${bundle.target}] model_training_job"
+      description: Train ML model and register to Unity Catalog
+      schedule:
+        quartz_cron_expression: "0 0 2 * * ?"  # Daily at 2 AM - adjust as needed
+        timezone_id: "America/Los_Angeles"
+        pause_status: PAUSED  # Pause by default; enable after validation
+      tasks:
+        - task_key: train_model
+          notebook_task:
+            notebook_path: ../src/training/train_model.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              model_name: ${var.model_name}
+      tags:
+        env: ${bundle.target}
+        project: ml-model-bundle

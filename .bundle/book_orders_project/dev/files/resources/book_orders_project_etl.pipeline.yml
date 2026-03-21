@@ -1,0 +1,27 @@
+# The main pipeline for book_orders_project
+resources:
+  pipelines:
+    dlt_china:
+      name: dlt China dab
+      configuration:
+        "dataset_path": "/Volumes/hilton_catalog/bronze/dataset"
+        # Spark configuration to handle protobuf serialization issues
+        "spark.databricks.delta.optimizeWrite.enabled": "true"
+        "spark.databricks.delta.autoCompact.enabled": "true"
+        "spark.sql.adaptive.enabled": "true"
+        "spark.sql.adaptive.coalescePartitions.enabled": "true"
+      libraries:
+        - glob:
+            include: ./src/dlt.ipynb
+        - glob:
+            include: ./src/cdc.ipynb
+      catalog: hilton_hotmail
+      channel: current
+      continuous: false
+      photon: true
+      root_path: ./src
+      # target field removed - keeping existing pipeline target schema
+      serverless: true
+      permissions:
+        - user_name: hma68@hotmail.com
+          level: CAN_MANAGE

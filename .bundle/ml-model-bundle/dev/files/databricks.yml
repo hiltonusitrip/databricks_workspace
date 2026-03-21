@@ -1,0 +1,41 @@
+# Databricks Asset Bundle for ML Model - Dev to Prod promotion
+# See: https://docs.databricks.com/en/dev-tools/bundles/
+
+bundle:
+  name: ml-model-bundle
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog for model registration
+    default: hilton_hotmail
+  schema:
+    description: Schema for model registration
+    default: default
+  model_name:
+    description: Registered model name
+    default: wine_quality_model
+
+targets:
+  # Development - hilton_hotmail workspace (matches ~/.databrickscfg)
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-3a9c6033-1f4e.cloud.databricks.com
+    variables:
+      catalog: hilton_hotmail
+      schema: default
+      model_name: wine_quality_model
+
+
+  # Production
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-c382fa4e-0ede.cloud.databricks.com
+      catalog: prod_2
+      schema: default
+      model_name: wine_quality_model

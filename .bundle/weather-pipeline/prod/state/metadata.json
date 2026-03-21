@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "config": {
+    "bundle": {
+      "name": "weather-pipeline",
+      "target": "prod",
+      "git": {
+        "branch": "main",
+        "origin_url": "https://github.com/hiltonusitrip/databricks_hilton",
+        "commit": "d48ee3e489e0ee94123d80a739c0a8337b1e2a1c",
+        "bundle_root_path": "."
+      }
+    },
+    "workspace": {
+      "file_path": "/Workspace/Users/hma68@hotmail.com/.bundle/weather-pipeline/prod/files"
+    },
+    "resources": {
+      "jobs": {
+        "ingest_weather_job": {
+          "id": "199339918502729",
+          "relative_path": "resources/jobs.yml"
+        }
+      }
+    },
+    "presets": {
+      "source_linked_deployment": false
+    }
+  },
+  "extra": {}
+}

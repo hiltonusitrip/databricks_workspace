@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "config": {
+    "bundle": {
+      "name": "ml-model-bundle",
+      "target": "dev",
+      "mode": "development",
+      "git": {
+        "bundle_root_path": "."
+      }
+    },
+    "workspace": {
+      "file_path": "/Workspace/Users/hma68@hotmail.com/.bundle/ml-model-bundle/dev/files"
+    },
+    "resources": {
+      "jobs": {
+        "model_promotion_job": {
+          "id": "454086265274876",
+          "relative_path": "resources/model-promotion-job.yml"
+        },
+        "model_training_job": {
+          "id": "462535949577359",
+          "relative_path": "resources/model-training-job.yml"
+        },
+        "register_from_path_job": {
+          "id": "525090704169909",
+          "relative_path": "resources/register-from-path-job.yml"
+        }
+      }
+    },
+    "presets": {
+      "source_linked_deployment": false
+    }
+  },
+  "extra": {}
+}

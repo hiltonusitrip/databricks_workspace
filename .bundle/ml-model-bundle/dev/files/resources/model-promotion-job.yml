@@ -1,0 +1,30 @@
+# Model promotion job - copies model from dev catalog to target catalog
+# REQUIRES: source and target catalogs in the SAME Unity Catalog metastore.
+# If target catalog is in a different workspace/metastore, copy_model_version cannot
+# cross metastores. Use one of:
+#   1. Link both workspaces to the same metastore (account admin), then run this job in dev.
+#   2. Delta Sharing: share model from dev; in prod, receive and register to prod_2.
+#   3. Run the "register_from_path" job in PROD with artifact_path pointing to shared storage.
+# Uses serverless compute (no cluster definition) for serverless-only workspaces.
+
+resources:
+  jobs:
+    model_promotion_job:
+      name: "[${bundle.target}] model_promotion_job"
+      description: Promote model from staging to production (copy_model_version)
+      # No schedule - run manually or via CI/CD
+      tasks:
+        - task_key: promote_model
+          notebook_task:
+            notebook_path: ../src/deployment/promote_model.py
+            base_parameters:
+              source_catalog: hilton_hotmail
+              source_schema: default
+              source_model: wine_quality_model
+              source_version: "2"
+              target_catalog: prod_2
+              target_schema: default
+              target_model: wine_quality_model
+      tags:
+        env: ${bundle.target}
+        project: ml-model-bundle

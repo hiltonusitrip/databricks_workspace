@@ -1,0 +1,42 @@
+bundle:
+  name: weather-pipeline
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: target catalog
+    default: dev
+  schema:
+    description: target schema
+    default: bronze
+  job_pause_status:
+    description: schedule state
+    default: PAUSED
+
+targets:
+  dev:
+    default: true
+    workspace:
+      host: https://dbc-3a9c6033-1f4e.cloud.databricks.com/
+    variables:
+      catalog: dev
+      schema: bronze
+      job_pause_status: PAUSED
+
+  test:
+    workspace:
+      host: https://dbc-3a9c6033-1f4e.cloud.databricks.com/
+    variables:
+      catalog: test
+      schema: bronze
+      job_pause_status: PAUSED
+
+  prod:
+    workspace:
+      host: https://dbc-3a9c6033-1f4e.cloud.databricks.com/
+    variables:
+      catalog: prod_2
+      schema: bronze
+      job_pause_status: UNPAUSED

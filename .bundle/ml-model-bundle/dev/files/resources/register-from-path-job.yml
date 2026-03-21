@@ -1,0 +1,22 @@
+# Run in PROD workspace when source model is in a different metastore (dev).
+# 1. Copy the model artifact from dev to a path prod can read (e.g. shared volume).
+# 2. Deploy with -t prod, then run this job with base_parameter artifact_path set.
+# Uses serverless compute.
+
+resources:
+  jobs:
+    register_from_path_job:
+      name: "[${bundle.target}] register_model_from_path"
+      description: Register model from shared path into prod_2 (for cross-metastore promotion)
+      tasks:
+        - task_key: register_from_path
+          notebook_task:
+            notebook_path: ../src/deployment/register_from_path.py
+            base_parameters:
+              artifact_path: ""  # Set when running: path to copied model artifact (e.g. /Volumes/... or dbfs:/...)
+              target_catalog: prod_2
+              target_schema: default
+              target_model: wine_quality_model
+      tags:
+        env: ${bundle.target}
+        project: ml-model-bundle
