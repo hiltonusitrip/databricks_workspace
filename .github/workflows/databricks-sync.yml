@@ -1,9 +1,8 @@
-name: Deploy to Databricks
+name: Databricks Incremental Deploy
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   deploy:
@@ -12,19 +11,59 @@ jobs:
     env:
       DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
       DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      WORKSPACE_PATH: /Repos/databricks_workspace
 
     steps:
-      - name: Checkout repository
+      # 1️⃣ Checkout repo with history (IMPORTANT)
+      - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
+      # 2️⃣ Install Databricks CLI
       - name: Install Databricks CLI
-        uses: databricks/setup-cli@main
-
-      - name: Verify CLI
-        run: databricks version
-
-      - name: Sync files to Databricks
         run: |
-          databricks sync \
-          dp_pro/ \
-          /Users/hma68@hotmail.com/dp_pro
+          pip install databricks-cli
+
+      # 3️⃣ Verify authentication
+      - name: Verify Databricks CLI
+        run: |
+          databricks current-user me
+
+      # 4️⃣ Get changed files
+      - name: Get changed files
+        run: |
+          git diff --name-status HEAD~1 HEAD > changes.txt
+          echo "Changed files:"
+          cat changes.txt
+
+      # 5️⃣ Delete removed files from Databricks
+      - name: Delete removed files
+        run: |
+          while read status file; do
+            if [ "$status" = "D" ]; then
+              TARGET="${WORKSPACE_PATH}/$file"
+              echo "Deleting $TARGET"
+              databricks workspace delete "$TARGET" || true
+            fi
+          done < changes.txt
+
+      # 6️⃣ Upload new & modified files
+      - name: Upload changed files
+        run: |
+          while read status file; do
+            TARGET="${WORKSPACE_PATH}/$file"
+
+            if [ "$status" = "A" ] || [ "$status" = "M" ]; then
+              echo "Uploading $file → $TARGET"
+
+              # Create directory if needed
+              databricks workspace mkdirs "$(dirname "$TARGET")"
+
+              databricks workspace import \
+                "$file" \
+                "$TARGET" \
+                --format SOURCE \
+                --overwrite
+            fi
+          done < changes.txt
