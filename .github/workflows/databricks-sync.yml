@@ -45,6 +45,11 @@ jobs:
           while read status file; do
             TARGET="${WORKSPACE_PATH}/$file"
 
+            if [[ "$file" != *.py && "$file" != *.sql && "$file" != *.ipynb && "$file" != *.scala && "$file" != *.r ]]; then
+              echo "Skipping unsupported file type: $file"
+              continue
+            fi
+
             if [ "$status" = "A" ] || [ "$status" = "M" ]; then
               echo "Uploading $file → $TARGET"
 
