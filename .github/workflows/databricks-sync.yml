@@ -11,7 +11,7 @@ jobs:
     env:
       DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
       DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-      WORKSPACE_PATH: /Repos/databricks_workspace
+      WORKSPACE_PATH: /Workspace/Users/hma68@hotmail.com/databricks_workspace
 
     steps:
       - name: Checkout repo
