@@ -19,10 +19,9 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Install Databricks CLI
+      - name: Install Databricks CLI (new)
         run: |
-          pip install databricks-cli
-
+          curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
 
       - name: Get changed files
         run: |
@@ -56,10 +55,5 @@ jobs:
               # Create directory if needed
               databricks workspace mkdirs "$(dirname "$TARGET")"
 
-              databricks workspace import \
-                "$file" \
-                "$TARGET" \
-                --format SOURCE \
-                --overwrite
             fi
           done < changes.txt
