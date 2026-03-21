@@ -25,6 +25,6 @@ jobs:
 
       - name: Sync files to Databricks
         run: |
-          databricks sync \
+          databricks sync --dry-run \
           ./ \
           /Users/hma68@hotmail.com
