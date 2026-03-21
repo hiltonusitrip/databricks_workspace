@@ -7,7 +7,7 @@ display(doc_articles)
 
 
 # COMMAND ----------
-
+# TEST10
 # MAGIC %pip install databricks-vectorsearch
 # MAGIC
 # MAGIC dbutils.library.restartPython()
