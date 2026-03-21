@@ -1,10 +1,8 @@
-# it is a test
-
 # Databricks notebook source
 dbutils.widgets.text("latitude", "37.77")
 dbutils.widgets.text("longitude", "-122.41")
 dbutils.widgets.text("target_table", "dev.bronze.weather_current")
-
+# test
 latitude = dbutils.widgets.get("latitude")
 longitude = dbutils.widgets.get("longitude")
 target_table = dbutils.widgets.get("target_table")
