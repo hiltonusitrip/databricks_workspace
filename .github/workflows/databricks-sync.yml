@@ -14,30 +14,22 @@ jobs:
       WORKSPACE_PATH: /Repos/databricks_workspace
 
     steps:
-      # 1️⃣ Checkout repo with history (IMPORTANT)
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      # 2️⃣ Install Databricks CLI
       - name: Install Databricks CLI
         run: |
           pip install databricks-cli
 
-      # 3️⃣ Verify authentication
-      - name: Verify Databricks CLI
-        run: |
-          databricks current-user me
 
-      # 4️⃣ Get changed files
       - name: Get changed files
         run: |
           git diff --name-status HEAD~1 HEAD > changes.txt
           echo "Changed files:"
           cat changes.txt
 
-      # 5️⃣ Delete removed files from Databricks
       - name: Delete removed files
         run: |
           while read status file; do
@@ -48,7 +40,6 @@ jobs:
             fi
           done < changes.txt
 
-      # 6️⃣ Upload new & modified files
       - name: Upload changed files
         run: |
           while read status file; do
