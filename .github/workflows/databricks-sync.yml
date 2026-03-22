@@ -54,7 +54,17 @@ jobs:
 
               # Create directory if needed
               databricks workspace mkdirs "$(dirname "$TARGET")"
-            
-              databricks workspace import $TARGET --file $file --format AUTO --overwrite
+        
+              if [[ "$file" == *.scala ]]; then
+                databricks workspace import "$TARGET" \
+                --file "$file" \
+                --language SCALA \
+                --overwrite
+              else
+                databricks workspace import "$TARGET" \
+                --file "$file" \
+                --format AUTO \
+                --overwrite
+              fi 
             fi
           done < changes.txt
